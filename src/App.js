@@ -38,6 +38,7 @@ class App extends Component {
     this.setState({ loggedInUser: {} });
   }
   
+  
   render() {
     let { loggedInUser, email, password } = this.state;
     return (

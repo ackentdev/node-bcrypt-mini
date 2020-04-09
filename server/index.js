@@ -23,6 +23,7 @@ massive(CONNECTION_STRING).then(db => {
   console.log('db connected');
 });
 
+
 app.post('/auth/signup', (req, res, next) => {
   // set db = to req.app.get("db") so we have access to the database instance set up when we connected with massive
   const db = req.app.get("db");
