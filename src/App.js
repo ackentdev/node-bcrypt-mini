@@ -12,33 +12,49 @@ class App extends Component {
     };
   }
 
-  async login() {
-    const {email, password} = this.state;
-    const response = await axios.post('/auth/login', {email, password})
+  componentDidMount(){
+    this.getUserSession();
+  }
+
+  async getUserSession(){
+    const response = await axios.get('/auth/user')
     this.setState({
-      loggedInUser: response.data,
-      email: '',
-      password: ''
+      loggedInUser: response.data
     })
   }
 
-  signup() {
-    const {email, password} = this.state;
-    axios.post("/auth/signup", {email, password}).then(response => {
-      this.setState({
-        email: '',
-        password: '',
-        loggedInUser: response.data
-      })
+  async login() {
+    const { email, password } = this.state;
+    const response = await axios.post('/auth/login', {email, password})
+    this.setState({
+      email: '',
+      password: '',
+      loggedInUser: response.data
     })
+  }
+
+  async signup() {
+    const { email, password } = this.state;
+    const response = await axios.post('/auth/signup', {email, password})
+    this.setState({
+      email: '',
+      password: '',
+      loggedInUser: response.data
+    })
+    // axios.post('/auth/signup', {email, password}).then(res => {
+    //   this.setState({
+    //     loggedInUser: res.data
+    //   })
+    // })
   }
 
   logout() {
     axios.get('/auth/logout');
-    this.setState({ loggedInUser: {} });
+    this.setState({
+      loggedInUser: {}
+    })
   }
-  
-  
+
   render() {
     let { loggedInUser, email, password } = this.state;
     return (

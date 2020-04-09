@@ -19,10 +19,9 @@ app.use(
 );
 
 massive(CONNECTION_STRING).then(db => {
+  console.log('connected to db')
   app.set('db', db);
-  console.log('db connected');
 });
-
 
 app.post('/auth/signup', (req, res, next) => {
   // set db = to req.app.get("db") so we have access to the database instance set up when we connected with massive
@@ -37,7 +36,7 @@ app.post('/auth/signup', (req, res, next) => {
     if (user.length) {
       // error message if email isnt found
       res.status(400).send("email already exists in database");
-    }
+    } else {
 
     // allow user to signup if no user was found
     const saltRounds = 12;
@@ -57,16 +56,15 @@ app.post('/auth/signup', (req, res, next) => {
         });
       });
     });
-  });
+  }});
 });
 
-
 app.post('/auth/login', (req, res, next) => {
-  const {email, password} = req.body
-  const db = req.app.get("db");
-  db.check_user_exists(email).then(user => {
-    if (!user.length) {
-      res.status(400).send(`incorrect email/password`);
+  const { email, password } = req.body;
+  const db = req.app.get('db');
+  db.check_user_exists(email).then( user => {
+    if(!user.length){
+      res.status(400).send('User does not exist')
     } else {
       bcrypt.compare(password, user[0].user_password).then(isAuthenticated => {
         if(isAuthenticated){
@@ -74,10 +72,9 @@ app.post('/auth/login', (req, res, next) => {
             id: user[0].id,
             email: user[0].email
           }
-
           res.status(200).send(req.session.user)
-        }else {
-          res.status(400).send(`that is the incorrect email/password`);
+        } else {
+          res.status(400).send('that is the incorrect email/password')
         }
       })
     }
@@ -87,7 +84,15 @@ app.post('/auth/login', (req, res, next) => {
 app.get('/auth/logout', (req, res) => {
   req.session.destroy();
   res.sendStatus(200);
-});
+})
+
+app.get('/auth/user', (req, res) => {
+  if(req.session.user){
+    res.status(200).send(req.session.user)
+  } else {
+    res.status(404).send('user not found')
+  }
+})
 
 app.listen(SERVER_PORT, () => {
   console.log(`Listening on port: ${SERVER_PORT}`);
